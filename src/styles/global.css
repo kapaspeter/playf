@@ -1,0 +1,60 @@
+@import './reset.css';
+@import './variables.css';
+
+:root {
+  --container-max-width: 1200px;
+  --header-height: 80px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-body);
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+body.menu-open {
+  overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.75rem; }
+
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+  width: 100%;
+}
+
+main {
+  flex: 1;
+  padding-bottom: var(--space-xxl);
+}
+
+section {
+  padding: var(--space-xxl) 0;
+}
+
+/* Accessibility: Focus states */
+a:focus, button:focus {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.75rem; }
+  
+  .container {
+    padding: 0 var(--space-sm);
+  }
+}

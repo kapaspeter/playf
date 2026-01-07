@@ -1,0 +1,8 @@
+{
+  "track_id": "localized_reservations_admin_security_20260107",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-07T14:00:00Z",
+  "updated_at": "2026-01-07T14:00:00Z",
+  "description": "Fixed localized reservation form rendering and implemented secure root admin route with password protection."
+}

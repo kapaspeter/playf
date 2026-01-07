@@ -1,0 +1,57 @@
+.reservationForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 500px;
+  margin-top: var(--space-xl);
+  padding: var(--space-xl);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.formGroup label {
+  font-weight: bold;
+  color: var(--color-gray-800);
+}
+
+.formGroup input,
+.formGroup select {
+  padding: var(--space-sm);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-sm);
+}
+
+.error {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+}
+
+.submitBtn {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: var(--space-md);
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+}
+
+.successMessage {
+  padding: var(--space-xl);
+  background: var(--color-mint);
+  border-radius: var(--radius-md);
+  text-align: center;
+  margin-top: var(--space-xl);
+}

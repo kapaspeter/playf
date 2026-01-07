@@ -1,0 +1,253 @@
+---
+import { getCollection } from 'astro:content';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import '../styles/global.css';
+import { getRelativeLocaleUrl, useTranslations } from '../utils/i18n';
+
+interface Props {
+	title: string;
+  MetaKeywords?: string;
+  MetaDescription?: string;
+}
+
+const { title, MetaKeywords, MetaDescription } = Astro.props;
+const currentLocale = Astro.currentLocale || Astro.params.lang || 'en';
+const t = useTranslations(currentLocale as any);
+const { pathname } = Astro.url;
+
+// Resolve localized slugs for navigation
+const allPages = await getCollection('pages');
+const currentLocalePages = allPages.filter(p => p.id.startsWith(`${currentLocale}/`));
+
+const getLocalizedPath = (filename: string) => {
+  const page = currentLocalePages.find(p => p.id === `${currentLocale}/${filename}`);
+  if (page && page.data.slug) {
+    return getRelativeLocaleUrl(currentLocale as string, page.data.slug);
+  }
+  return getRelativeLocaleUrl(currentLocale as string, filename);
+};
+
+const isActive = (path: string) => {
+  const url = path.startsWith('/') ? path : getLocalizedPath(path);
+  if (path === '' || path === '/') {
+    const homeUrl = getRelativeLocaleUrl(currentLocale as string, '');
+    return pathname === homeUrl || pathname === `${homeUrl}/`;
+  }
+  return pathname.startsWith(url);
+};
+---
+
+<!doctype html>
+<html lang={currentLocale}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={MetaDescription || "Plyfull Playground"} />
+    {MetaKeywords && <meta name="keywords" content={MetaKeywords} />}
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+    
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      window.localStorage.setItem('theme', theme);
+    </script>
+	</head>
+	<body>
+		<header>
+      <nav class="container">
+        <div class="logo">Plyfull</div>
+        
+        <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+          <svg class="icon-menu" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <div class="nav-links">
+          <a href={getRelativeLocaleUrl(currentLocale || 'en', '')} class={isActive('') ? 'active' : ''}>{t('nav.home')}</a>
+          <a href={getLocalizedPath('about')} class={isActive('about') ? 'active' : ''}>{t('nav.about')}</a>
+          <a href={getLocalizedPath('services')} class={isActive('services') ? 'active' : ''}>{t('nav.services')}</a>
+          <a href={getLocalizedPath('gallery')} class={isActive('gallery') ? 'active' : ''}>{t('nav.gallery')}</a>
+          <a href={getLocalizedPath('reservation')} class={isActive('reservation') ? 'active' : ''}>{t('nav.reservation')}</a>
+        </div>
+        <div class="nav-actions">
+          <ThemeToggle />
+          <LanguageSwitcher />
+        </div>
+      </nav>
+    </header>
+
+    <script>
+      const setupMobileMenu = () => {
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        toggle?.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          navLinks?.classList.toggle('open');
+          toggle.classList.toggle('active');
+          document.body.classList.toggle('menu-open');
+        });
+      };
+      setupMobileMenu();
+      document.addEventListener('astro:after-swap', setupMobileMenu);
+    </script>
+		<slot />
+    <footer>
+      <div class="container">
+        <p>&copy; 2026 Plyfull. All rights reserved.</p>
+        <p style="margin-top: var(--space-sm); font-size: 0.8rem;">
+          <a href="/admin/reservations" style="color: var(--text-muted); text-decoration: none;">Admin</a>
+        </p>
+      </div>
+    </footer>
+	</body>
+</html>
+
+<style>
+  header {
+    background-color: var(--bg-body);
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--space-md) var(--space-xl);
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) 0;
+  }
+
+  .logo {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    z-index: 1001;
+  }
+
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-body);
+    cursor: pointer;
+    padding: var(--space-xs);
+    z-index: 1001;
+  }
+
+  .mobile-menu-toggle .icon-close {
+    display: none;
+  }
+
+  .mobile-menu-toggle.active .icon-menu {
+    display: none;
+  }
+
+  .mobile-menu-toggle.active .icon-close {
+    display: block;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    z-index: 1001;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: var(--space-lg);
+  }
+
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-body);
+    font-weight: 500;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-primary);
+  }
+
+  .nav-links a.active {
+    color: var(--color-primary);
+    font-weight: 600;
+    border-bottom-color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: block;
+    }
+
+    .nav-links {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: var(--bg-body);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-xl);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .nav-links.open {
+      transform: translateX(0);
+    }
+
+    .nav-links a {
+      font-size: 1.5rem;
+      border-bottom: none;
+    }
+
+    .nav-links a.active {
+      background-color: var(--bg-surface);
+      width: 100%;
+      text-align: center;
+      padding: var(--space-md) 0;
+    }
+  }
+
+  footer {
+    text-align: center;
+    padding: var(--space-xl);
+    background-color: var(--bg-surface);
+    margin-top: auto;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+</style>

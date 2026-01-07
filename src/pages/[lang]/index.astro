@@ -1,0 +1,37 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  // Match home pages by looking at the filename part of the id
+  return pages
+    .filter(page => page.id.endsWith('/home') || page.id === 'home')
+    .map(page => {
+      const lang = page.id.split('/')[0];
+      return { params: { lang } };
+    });
+}
+
+const { lang } = Astro.params;
+const entry = await getEntry('pages', `${lang}/home`);
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
+const { Content } = await render(entry);
+---
+
+<Layout 
+  title={entry.data.title}
+  MetaKeywords={entry.data.MetaKeywords}
+  MetaDescription={entry.data.MetaDescription}
+>
+	<main class="container" style="padding: var(--space-xl) var(--space-md); background-color: var(--bg-body); flex: 1;">
+		<h1 style="color: var(--color-primary);">{entry.data.title}</h1>
+		<Content />
+	</main>
+</Layout>

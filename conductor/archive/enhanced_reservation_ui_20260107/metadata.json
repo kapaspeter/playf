@@ -1,0 +1,8 @@
+{
+  "track_id": "enhanced_reservation_ui_20260107",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-07T12:00:00Z",
+  "updated_at": "2026-01-07T12:00:00Z",
+  "description": "Enhanced Reservation System, Dark/Light mode, and UI polish including language flags and admin blocking."
+}

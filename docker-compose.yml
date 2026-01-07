@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    container_name: plyfull_app
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./src:/app/src
+      - ./content:/app/src/content/pages
+      - ./db:/app/db
+      - ./public:/app/public
+      - ./prisma:/app/prisma
+      - ./package.json:/app/package.json
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL:-file:/app/db/dev.db}
+    command: >
+      sh -c "npx prisma generate && if [ \"$NODE_ENV\" = \"production\" ]; then
+        npm run build && npm run preview -- --host 0.0.0.0;
+      else
+        npm run dev -- --host 0.0.0.0;
+      fi"
